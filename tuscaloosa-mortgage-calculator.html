@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tuscaloosa County Mortgage Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .calculator-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .calculate-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        
+        .result-label {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .result-value {
+            color: #007bff;
+            font-weight: bold;
+        }
+        
+        .total-payment {
+            border-top: 2px solid #4CAF50;
+            padding-top: 10px;
+            margin-top: 15px;
+            font-size: 18px;
+        }
+        
+        .info-box {
+            background-color: #e7f3ff;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h3 {
+            margin-top: 0;
+            color: #0c5460;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 600px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <h1>Tuscaloosa County Mortgage Calculator</h1>
+        
+        <div class="info-box">
+            <h3>Tuscaloosa County Tax Information</h3>
+            <p>This calculator includes Tuscaloosa County's property tax rates. The average effective property tax rate is approximately <strong>0.33-0.46%</strong>, which is significantly lower than the national average of 1.02%.</p>
+        </div>
+        
+        <form id="mortgageForm">
+            <div class="two-column">
+                <div class="form-group">
+                    <label for="homePrice">Home Price ($)</label>
+                    <input type="number" id="homePrice" value="148400" min="0" step="1000" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="downPayment">Down Payment ($)</label>
+                    <input type="number" id="downPayment" value="29680" min="0" step="100" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="interestRate">Interest Rate (%)</label>
+                    <input type="number" id="interestRate" value="6.5" min="0" max="30" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loanTerm">Loan Term (years)</label>
+                    <select id="loanTerm" required>
+                        <option value="15">15 years</option>
+                        <option value="20">20 years</option>
+                        <option value="25">25 years</option>
+                        <option value="30" selected>30 years</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="propertyTaxRate">Millage Rate (mills)</label>
+                    <select id="propertyTaxRate" required>
+                        <option value="33">33 mills - County Average</option>
+                        <option value="46">46 mills - County Median</option>
+                        <option value="53">53 mills - Tuscaloosa City</option>
+                        <option value="custom">Custom Rate</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="customTaxGroup" style="display: none;">
+                    <label for="customTaxRate">Custom Millage Rate (mills)</label>
+                    <input type="number" id="customTaxRate" min="0" max="200" step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="homeInsurance">Home Insurance ($/year)</label>
+                    <input type="number" id="homeInsurance" value="1200" min="0" step="50" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pmi">PMI ($/month)</label>
+                    <input type="number" id="pmi" value="0" min="0" step="10">
+                </div>
+                
+                <div class="form-group">
+                    <label for="hoaFees">HOA Fees ($/month)</label>
+                    <input type="number" id="hoaFees" value="0" min="0" step="25">
+                </div>
+            </div>
+            
+            <button type="button" class="calculate-btn" onclick="calculateMortgage()">Calculate Mortgage Payment</button>
+        </form>
+        
+        <div id="results" class="results" style="display: none;">
+            <h3>Monthly Payment Breakdown</h3>
+            <div class="result-item">
+                <span class="result-label">Principal & Interest:</span>
+                <span class="result-value" id="principalInterest">$0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Property Tax:</span>
+                <span class="result-value" id="propertyTax">$0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Home Insurance:</span>
+                <span class="result-value" id="insurance">$0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">PMI:</span>
+                <span class="result-value" id="pmiAmount">$0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">HOA Fees:</span>
+                <span class="result-value" id="hoaAmount">$0</span>
+            </div>
+            <div class="result-item total-payment">
+                <span class="result-label">Total Monthly Payment:</span>
+                <span class="result-value" id="totalPayment">$0</span>
+            </div>
+            
+            <h3 style="margin-top: 20px;">Loan Summary</h3>
+            <div class="result-item">
+                <span class="result-label">Loan Amount:</span>
+                <span class="result-value" id="loanAmount">$0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Down Payment:</span>
+                <span class="result-value" id="downPaymentDisplay">$0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Interest Paid:</span>
+                <span class="result-value" id="totalInterest">$0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Cost of Loan:</span>
+                <span class="result-value" id="totalCost">$0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide custom tax rate input
+        document.getElementById('propertyTaxRate').addEventListener('change', function() {
+            const customGroup = document.getElementById('customTaxGroup');
+            if (this.value === 'custom') {
+                customGroup.style.display = 'block';
+                document.getElementById('customTaxRate').required = true;
+            } else {
+                customGroup.style.display = 'none';
+                document.getElementById('customTaxRate').required = false;
+            }
+        });
+
+        // Auto-calculate PMI if down payment is less than 20%
+        document.getElementById('downPayment').addEventListener('input', function() {
+            const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
+            const downPayment = parseFloat(this.value) || 0;
+            const downPaymentPercent = (downPayment / homePrice) * 100;
+            
+            if (downPaymentPercent < 20 && homePrice > 0) {
+                const loanAmount = homePrice - downPayment;
+                const estimatedPMI = Math.round((loanAmount * 0.005) / 12); // 0.5% annually
+                document.getElementById('pmi').value = estimatedPMI;
+            } else {
+                document.getElementById('pmi').value = 0;
+            }
+        });
+
+        document.getElementById('homePrice').addEventListener('input', function() {
+            document.getElementById('downPayment').dispatchEvent(new Event('input'));
+        });
+
+        function calculateMortgage() {
+            // Get input values
+            const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
+            const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+            const annualRate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
+            const loanTermYears = parseInt(document.getElementById('loanTerm').value) || 30;
+            
+            let millageRate;
+            const taxRateSelect = document.getElementById('propertyTaxRate').value;
+            if (taxRateSelect === 'custom') {
+                millageRate = parseFloat(document.getElementById('customTaxRate').value) || 0;
+            } else {
+                millageRate = parseFloat(taxRateSelect) || 0;
+            }
+            
+            const annualInsurance = parseFloat(document.getElementById('homeInsurance').value) || 0;
+            const monthlyPMI = parseFloat(document.getElementById('pmi').value) || 0;
+            const monthlyHOA = parseFloat(document.getElementById('hoaFees').value) || 0;
+
+            // Validate inputs
+            if (homePrice <= 0 || downPayment >= homePrice) {
+                alert('Please enter valid home price and down payment values.');
+                return;
+            }
+
+            // Calculate loan amount
+            const loanAmount = homePrice - downPayment;
+            
+            // Calculate monthly payment (Principal & Interest)
+            const monthlyRate = annualRate / 12;
+            const numPayments = loanTermYears * 12;
+            
+            let monthlyPI = 0;
+            if (monthlyRate > 0) {
+                monthlyPI = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                           (Math.pow(1 + monthlyRate, numPayments) - 1);
+            } else {
+                monthlyPI = loanAmount / numPayments;
+            }
+            
+            // Calculate other monthly costs
+            // Alabama formula: (Appraised Value × Assessment Rate) × Millage Rate = Property Tax Bill
+            // Assessment Rate is 10% for residential property
+            // Millage rate is expressed in "mills" where 1 mill = 0.1 cents = 0.001 dollars
+            const assessedValue = homePrice * 0.10;
+            const annualPropertyTax = assessedValue * (millageRate * 0.001); // Convert mills to decimal
+            const monthlyPropertyTax = annualPropertyTax / 12;
+            const monthlyInsurance = annualInsurance / 12;
+            
+            // Calculate total monthly payment
+            const totalMonthlyPayment = monthlyPI + monthlyPropertyTax + monthlyInsurance + monthlyPMI + monthlyHOA;
+            
+            // Calculate total interest and cost
+            const totalPrincipalInterest = monthlyPI * numPayments;
+            const totalInterest = totalPrincipalInterest - loanAmount;
+            const totalCostOfLoan = homePrice + totalInterest + (annualInsurance * loanTermYears) + 
+                                   (monthlyPMI * numPayments) + (monthlyHOA * numPayments);
+
+            // Display results
+            document.getElementById('principalInterest').textContent = '$' + monthlyPI.toFixed(2);
+            document.getElementById('propertyTax').textContent = '$' + monthlyPropertyTax.toFixed(2);
+            document.getElementById('insurance').textContent = '$' + monthlyInsurance.toFixed(2);
+            document.getElementById('pmiAmount').textContent = '$' + monthlyPMI.toFixed(2);
+            document.getElementById('hoaAmount').textContent = '$' + monthlyHOA.toFixed(2);
+            document.getElementById('totalPayment').textContent = '$' + totalMonthlyPayment.toFixed(2);
+            
+            document.getElementById('loanAmount').textContent = '$' + loanAmount.toLocaleString();
+            document.getElementById('downPaymentDisplay').textContent = '$' + downPayment.toLocaleString();
+            document.getElementById('totalInterest').textContent = '$' + totalInterest.toLocaleString();
+            document.getElementById('totalCost').textContent = '$' + totalCostOfLoan.toLocaleString();
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Calculate on page load with default values
+        window.addEventListener('load', function() {
+            calculateMortgage();
+        });
+    </script>
+</body>
+</html>
