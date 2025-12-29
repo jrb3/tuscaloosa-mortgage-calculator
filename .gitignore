@@ -28,6 +28,10 @@ build/
 # Personal files
 House Pics /
 
+# Python scripts (not part of main project)
+convert_pdf.py
+r40_russell3000_screen*.py
+
 # OS files
 .DS_Store
 Thumbs.db

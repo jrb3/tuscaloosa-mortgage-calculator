@@ -103,7 +103,5 @@ Type these prefixes in VS Code and press Tab:
 │   ├── keybindings.json                    # Custom keyboard shortcuts
 │   └── html.code-snippets                  # Code snippets
 ├── .venv/                                  # Python virtual environment
-├── convert_pdf.py                          # PDF conversion utility
-├── r40_russell3000_screen (1).py          # Russell 3000 screening script
 └── landing-page/                           # Additional web content
 ```

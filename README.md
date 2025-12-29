@@ -153,8 +153,6 @@ tuscaloosa-mortgage-calculator/
 │   ├── keybindings.json                 # Custom shortcuts
 │   └── html.code-snippets               # Code snippets
 │
-├── convert_pdf.py                       # PDF conversion utility
-├── r40_russell3000_screen (1).py       # Stock screening script
 └── landing-page/                        # Additional web content
 ```
 
@@ -200,25 +198,6 @@ If you know your specific property's millage rate:
 2. Enter your exact millage rate
 3. Calculator updates automatically
 
-## Python Utilities
-
-The repository includes additional Python scripts:
-
-### convert_pdf.py
-PDF to CSV conversion utility using Docling library.
-
-**Note**: Currently has compatibility issues with Docling API. See [Issues](#known-issues).
-
-### r40_russell3000_screen.py
-Russell 3000 stock screening using Rule of 40 metric.
-
-**Usage**:
-```bash
-source .venv/bin/activate
-export FMP_API_KEY="your-api-key"
-python "r40_russell3000_screen (1).py" --help
-```
-
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -228,11 +207,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## Known Issues
-
-- `convert_pdf.py`: API compatibility issue with Docling library (line 28)
-- Python script filename contains version suffix `(1)` - needs cleanup
 
 ## Roadmap
 
