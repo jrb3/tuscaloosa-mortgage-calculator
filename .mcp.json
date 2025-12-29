@@ -29,6 +29,15 @@
       "env": {
         "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
       }
+    },
+    "docling": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from=docling-mcp",
+        "docling-mcp-server"
+      ],
+      "env": {}
     }
   }
 }
