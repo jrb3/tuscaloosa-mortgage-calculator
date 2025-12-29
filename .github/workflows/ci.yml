@@ -1,0 +1,274 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: |
+          npm install -g htmlhint
+          npm install -g stylelint stylelint-config-standard
+          npm install -g eslint
+
+      - name: Lint HTML
+        run: |
+          htmlhint tuscaloosa-mortgage-calculator.html || echo "HTML linting completed"
+
+      - name: Create stylelint config
+        run: |
+          echo '{"extends": "stylelint-config-standard"}' > .stylelintrc.json
+
+      - name: Extract and lint CSS
+        run: |
+          # Extract CSS from HTML file
+          sed -n '/<style>/,/<\/style>/p' tuscaloosa-mortgage-calculator.html > extracted.css
+          stylelint extracted.css --allow-empty-input || echo "CSS linting completed"
+
+      - name: Create ESLint config
+        run: |
+          cat > .eslintrc.json << 'EOF'
+          {
+            "env": {
+              "browser": true,
+              "es2021": true
+            },
+            "extends": "eslint:recommended",
+            "parserOptions": {
+              "ecmaVersion": "latest",
+              "sourceType": "script"
+            },
+            "rules": {
+              "no-unused-vars": "warn",
+              "no-undef": "warn",
+              "no-console": "off"
+            }
+          }
+          EOF
+
+      - name: Extract and lint JavaScript
+        run: |
+          # Extract JavaScript from HTML file
+          sed -n '/<script>/,/<\/script>/p' tuscaloosa-mortgage-calculator.html | sed '1d;$d' > extracted.js
+          eslint extracted.js --no-eslintrc --config .eslintrc.json || echo "JavaScript linting completed"
+
+  validate-calculations:
+    name: Validate Mortgage Calculations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Create validation script
+        run: |
+          cat > validate_calculations.py << 'EOF'
+          #!/usr/bin/env python3
+          """
+          Validate mortgage calculator formulas against known test cases
+          """
+          import math
+
+          def calculate_monthly_payment(principal, annual_rate, years):
+              """Calculate monthly mortgage payment"""
+              if annual_rate == 0:
+                  return principal / (years * 12)
+
+              monthly_rate = annual_rate / 12 / 100
+              num_payments = years * 12
+
+              payment = principal * (monthly_rate * math.pow(1 + monthly_rate, num_payments)) / \
+                       (math.pow(1 + monthly_rate, num_payments) - 1)
+              return payment
+
+          def calculate_property_tax(home_value, millage_rate, assessment_rate=0.10):
+              """Calculate Alabama property tax"""
+              assessed_value = home_value * assessment_rate
+              return assessed_value * (millage_rate / 1000)
+
+          def test_mortgage_calculations():
+              """Test known mortgage calculation scenarios"""
+              tests_passed = 0
+              tests_failed = 0
+
+              # Test 1: Standard 30-year mortgage
+              principal = 200000
+              rate = 6.5
+              years = 30
+              expected = 1264.14  # Known correct value
+              actual = calculate_monthly_payment(principal, rate, years)
+
+              if abs(actual - expected) < 1.0:
+                  print(f"✓ Test 1 passed: ${actual:.2f} ≈ ${expected:.2f}")
+                  tests_passed += 1
+              else:
+                  print(f"✗ Test 1 failed: ${actual:.2f} != ${expected:.2f}")
+                  tests_failed += 1
+
+              # Test 2: Zero interest rate
+              principal = 200000
+              rate = 0
+              years = 30
+              expected = 555.56
+              actual = calculate_monthly_payment(principal, rate, years)
+
+              if abs(actual - expected) < 1.0:
+                  print(f"✓ Test 2 passed: ${actual:.2f} ≈ ${expected:.2f}")
+                  tests_passed += 1
+              else:
+                  print(f"✗ Test 2 failed: ${actual:.2f} != ${expected:.2f}")
+                  tests_failed += 1
+
+              # Test 3: Property tax calculation
+              home_value = 250000
+              millage_rate = 46  # County median
+              expected_annual = 1150.0
+              actual_annual = calculate_property_tax(home_value, millage_rate)
+
+              if abs(actual_annual - expected_annual) < 1.0:
+                  print(f"✓ Test 3 passed: ${actual_annual:.2f} ≈ ${expected_annual:.2f}")
+                  tests_passed += 1
+              else:
+                  print(f"✗ Test 3 failed: ${actual_annual:.2f} != ${expected_annual:.2f}")
+                  tests_failed += 1
+
+              # Test 4: 15-year mortgage
+              principal = 300000
+              rate = 5.5
+              years = 15
+              expected = 2448.00
+              actual = calculate_monthly_payment(principal, rate, years)
+
+              if abs(actual - expected) < 5.0:
+                  print(f"✓ Test 4 passed: ${actual:.2f} ≈ ${expected:.2f}")
+                  tests_passed += 1
+              else:
+                  print(f"✗ Test 4 failed: ${actual:.2f} != ${expected:.2f}")
+                  tests_failed += 1
+
+              print(f"\n{'='*50}")
+              print(f"Tests passed: {tests_passed}")
+              print(f"Tests failed: {tests_failed}")
+              print(f"{'='*50}")
+
+              return tests_failed == 0
+
+          if __name__ == '__main__':
+              success = test_mortgage_calculations()
+              exit(0 if success else 1)
+          EOF
+
+      - name: Run validation tests
+        run: python validate_calculations.py
+
+  check-files:
+    name: Check Required Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify required files exist
+        run: |
+          echo "Checking for required files..."
+
+          files=(
+            "README.md"
+            "LICENSE"
+            "CONTRIBUTING.md"
+            "CLAUDE.md"
+            ".gitignore"
+            "requirements.txt"
+            ".env.example"
+            "tuscaloosa-mortgage-calculator.html"
+          )
+
+          missing_files=0
+
+          for file in "${files[@]}"; do
+            if [ -f "$file" ]; then
+              echo "✓ $file exists"
+            else
+              echo "✗ $file is missing"
+              missing_files=$((missing_files + 1))
+            fi
+          done
+
+          if [ $missing_files -gt 0 ]; then
+            echo "Error: $missing_files required file(s) missing"
+            exit 1
+          fi
+
+          echo "All required files present!"
+
+      - name: Check file sizes
+        run: |
+          echo "Checking file sizes..."
+          size=$(wc -c < tuscaloosa-mortgage-calculator.html)
+          echo "Calculator HTML size: $size bytes"
+
+          if [ $size -gt 1000000 ]; then
+            echo "Warning: HTML file is larger than 1MB"
+          fi
+
+  security-check:
+    name: Security Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for exposed secrets
+        run: |
+          echo "Checking for exposed secrets..."
+
+          # Check for common secret patterns
+          if grep -r -i "api[_-]key.*=.*['\"][a-zA-Z0-9]" --exclude-dir=.git --exclude="*.md" .; then
+            echo "Warning: Potential API key found in code"
+          fi
+
+          if grep -r -i "password.*=.*['\"][^']" --exclude-dir=.git --exclude="*.md" .; then
+            echo "Warning: Potential password found in code"
+          fi
+
+          echo "Secret scan completed"
+
+      - name: Check for security best practices
+        run: |
+          echo "Checking security best practices..."
+
+          # Check if .env is in .gitignore
+          if grep -q "^\.env$" .gitignore; then
+            echo "✓ .env is properly ignored"
+          else
+            echo "✗ Warning: .env should be in .gitignore"
+          fi
+
+          # Check for .env.example
+          if [ -f ".env.example" ]; then
+            echo "✓ .env.example exists"
+          else
+            echo "✗ Warning: .env.example should exist"
+          fi

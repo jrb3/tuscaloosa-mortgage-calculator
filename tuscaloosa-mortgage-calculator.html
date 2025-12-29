@@ -243,117 +243,316 @@
     </div>
 
     <script>
-        // Show/hide custom tax rate input
-        document.getElementById('propertyTaxRate').addEventListener('change', function() {
-            const customGroup = document.getElementById('customTaxGroup');
-            if (this.value === 'custom') {
-                customGroup.style.display = 'block';
-                document.getElementById('customTaxRate').required = true;
-            } else {
-                customGroup.style.display = 'none';
-                document.getElementById('customTaxRate').required = false;
-            }
-        });
+        /**
+         * Tuscaloosa County Mortgage Calculator
+         * Encapsulated in IIFE to avoid global scope pollution
+         */
+        (function() {
+            'use strict';
 
-        // Auto-calculate PMI if down payment is less than 20%
-        document.getElementById('downPayment').addEventListener('input', function() {
-            const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
-            const downPayment = parseFloat(this.value) || 0;
-            const downPaymentPercent = (downPayment / homePrice) * 100;
-            
-            if (downPaymentPercent < 20 && homePrice > 0) {
-                const loanAmount = homePrice - downPayment;
-                const estimatedPMI = Math.round((loanAmount * 0.005) / 12); // 0.5% annually
-                document.getElementById('pmi').value = estimatedPMI;
-            } else {
-                document.getElementById('pmi').value = 0;
-            }
-        });
+            // Constants
+            const ALABAMA_ASSESSMENT_RATE = 0.10; // 10% for residential property
+            const MILLS_TO_DECIMAL = 0.001;
+            const PMI_THRESHOLD = 20; // LTV threshold percentage
+            const DEFAULT_PMI_RATE = 0.005; // 0.5% annually
 
-        document.getElementById('homePrice').addEventListener('input', function() {
-            document.getElementById('downPayment').dispatchEvent(new Event('input'));
-        });
+            /**
+             * Validates mortgage input values
+             * @param {number} homePrice - Home purchase price
+             * @param {number} downPayment - Down payment amount
+             * @returns {Object} Validation result with isValid and error message
+             */
+            function validateInputs(homePrice, downPayment) {
+                if (isNaN(homePrice) || homePrice <= 0) {
+                    return {
+                        isValid: false,
+                        error: 'Please enter a valid home price greater than $0.'
+                    };
+                }
 
-        function calculateMortgage() {
-            // Get input values
-            const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
-            const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
-            const annualRate = parseFloat(document.getElementById('interestRate').value) / 100 || 0;
-            const loanTermYears = parseInt(document.getElementById('loanTerm').value) || 30;
-            
-            let millageRate;
-            const taxRateSelect = document.getElementById('propertyTaxRate').value;
-            if (taxRateSelect === 'custom') {
-                millageRate = parseFloat(document.getElementById('customTaxRate').value) || 0;
-            } else {
-                millageRate = parseFloat(taxRateSelect) || 0;
-            }
-            
-            const annualInsurance = parseFloat(document.getElementById('homeInsurance').value) || 0;
-            const monthlyPMI = parseFloat(document.getElementById('pmi').value) || 0;
-            const monthlyHOA = parseFloat(document.getElementById('hoaFees').value) || 0;
+                if (isNaN(downPayment) || downPayment < 0) {
+                    return {
+                        isValid: false,
+                        error: 'Please enter a valid down payment amount.'
+                    };
+                }
 
-            // Validate inputs
-            if (homePrice <= 0 || downPayment >= homePrice) {
-                alert('Please enter valid home price and down payment values.');
-                return;
+                if (downPayment >= homePrice) {
+                    return {
+                        isValid: false,
+                        error: 'Down payment must be less than the home price.'
+                    };
+                }
+
+                return { isValid: true };
             }
 
-            // Calculate loan amount
-            const loanAmount = homePrice - downPayment;
-            
-            // Calculate monthly payment (Principal & Interest)
-            const monthlyRate = annualRate / 12;
-            const numPayments = loanTermYears * 12;
-            
-            let monthlyPI = 0;
-            if (monthlyRate > 0) {
-                monthlyPI = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
-                           (Math.pow(1 + monthlyRate, numPayments) - 1);
-            } else {
-                monthlyPI = loanAmount / numPayments;
+            /**
+             * Calculates monthly mortgage payment using standard amortization formula
+             * @param {number} principal - Loan amount
+             * @param {number} annualRate - Annual interest rate (as decimal, e.g., 0.065 for 6.5%)
+             * @param {number} years - Loan term in years
+             * @returns {number} Monthly principal and interest payment
+             */
+            function calculateMonthlyPayment(principal, annualRate, years) {
+                try {
+                    const monthlyRate = annualRate / 12;
+                    const numPayments = years * 12;
+
+                    // Handle zero interest rate case
+                    if (monthlyRate === 0) {
+                        return principal / numPayments;
+                    }
+
+                    // Standard amortization formula
+                    const payment = principal *
+                        (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
+                        (Math.pow(1 + monthlyRate, numPayments) - 1);
+
+                    return payment;
+                } catch (error) {
+                    console.error('Error calculating monthly payment:', error);
+                    return 0;
+                }
             }
-            
-            // Calculate other monthly costs
-            // Alabama formula: (Appraised Value × Assessment Rate) × Millage Rate = Property Tax Bill
-            // Assessment Rate is 10% for residential property
-            // Millage rate is expressed in "mills" where 1 mill = 0.1 cents = 0.001 dollars
-            const assessedValue = homePrice * 0.10;
-            const annualPropertyTax = assessedValue * (millageRate * 0.001); // Convert mills to decimal
-            const monthlyPropertyTax = annualPropertyTax / 12;
-            const monthlyInsurance = annualInsurance / 12;
-            
-            // Calculate total monthly payment
-            const totalMonthlyPayment = monthlyPI + monthlyPropertyTax + monthlyInsurance + monthlyPMI + monthlyHOA;
-            
-            // Calculate total interest and cost
-            const totalPrincipalInterest = monthlyPI * numPayments;
-            const totalInterest = totalPrincipalInterest - loanAmount;
-            const totalCostOfLoan = homePrice + totalInterest + (annualInsurance * loanTermYears) + 
-                                   (monthlyPMI * numPayments) + (monthlyHOA * numPayments);
 
-            // Display results
-            document.getElementById('principalInterest').textContent = '$' + monthlyPI.toFixed(2);
-            document.getElementById('propertyTax').textContent = '$' + monthlyPropertyTax.toFixed(2);
-            document.getElementById('insurance').textContent = '$' + monthlyInsurance.toFixed(2);
-            document.getElementById('pmiAmount').textContent = '$' + monthlyPMI.toFixed(2);
-            document.getElementById('hoaAmount').textContent = '$' + monthlyHOA.toFixed(2);
-            document.getElementById('totalPayment').textContent = '$' + totalMonthlyPayment.toFixed(2);
-            
-            document.getElementById('loanAmount').textContent = '$' + loanAmount.toLocaleString();
-            document.getElementById('downPaymentDisplay').textContent = '$' + downPayment.toLocaleString();
-            document.getElementById('totalInterest').textContent = '$' + totalInterest.toLocaleString();
-            document.getElementById('totalCost').textContent = '$' + totalCostOfLoan.toLocaleString();
-            
-            // Show results
-            document.getElementById('results').style.display = 'block';
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-        }
+            /**
+             * Calculates Alabama property tax based on state assessment rules
+             * @param {number} homeValue - Appraised home value
+             * @param {number} millageRate - Local millage rate (in mills)
+             * @returns {number} Annual property tax amount
+             */
+            function calculatePropertyTax(homeValue, millageRate) {
+                try {
+                    // Alabama uses 10% assessment rate for residential property
+                    const assessedValue = homeValue * ALABAMA_ASSESSMENT_RATE;
+                    // Convert millage rate to decimal (1 mill = $0.001 per $1 of assessed value)
+                    const annualTax = assessedValue * (millageRate * MILLS_TO_DECIMAL);
+                    return annualTax;
+                } catch (error) {
+                    console.error('Error calculating property tax:', error);
+                    return 0;
+                }
+            }
 
-        // Calculate on page load with default values
-        window.addEventListener('load', function() {
-            calculateMortgage();
-        });
+            /**
+             * Calculates estimated monthly PMI based on loan amount
+             * @param {number} loanAmount - Total loan amount
+             * @param {number} rate - Annual PMI rate (default 0.5%)
+             * @returns {number} Monthly PMI payment
+             */
+            function calculatePMI(loanAmount, rate = DEFAULT_PMI_RATE) {
+                try {
+                    return Math.round((loanAmount * rate) / 12);
+                } catch (error) {
+                    console.error('Error calculating PMI:', error);
+                    return 0;
+                }
+            }
+
+            /**
+             * Formats a number as currency string
+             * @param {number} amount - Amount to format
+             * @param {boolean} withCents - Include cents in output
+             * @returns {string} Formatted currency string
+             */
+            function formatCurrency(amount, withCents = true) {
+                try {
+                    if (withCents) {
+                        return '$' + amount.toFixed(2);
+                    }
+                    return '$' + amount.toLocaleString('en-US', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    });
+                } catch (error) {
+                    console.error('Error formatting currency:', error);
+                    return '$0.00';
+                }
+            }
+
+            /**
+             * Updates the display of calculation results
+             * @param {Object} results - Calculation results object
+             */
+            function displayResults(results) {
+                try {
+                    // Monthly breakdown
+                    document.getElementById('principalInterest').textContent =
+                        formatCurrency(results.monthlyPI);
+                    document.getElementById('propertyTax').textContent =
+                        formatCurrency(results.monthlyPropertyTax);
+                    document.getElementById('insurance').textContent =
+                        formatCurrency(results.monthlyInsurance);
+                    document.getElementById('pmiAmount').textContent =
+                        formatCurrency(results.monthlyPMI);
+                    document.getElementById('hoaAmount').textContent =
+                        formatCurrency(results.monthlyHOA);
+                    document.getElementById('totalPayment').textContent =
+                        formatCurrency(results.totalMonthlyPayment);
+
+                    // Loan summary
+                    document.getElementById('loanAmount').textContent =
+                        formatCurrency(results.loanAmount, false);
+                    document.getElementById('downPaymentDisplay').textContent =
+                        formatCurrency(results.downPayment, false);
+                    document.getElementById('totalInterest').textContent =
+                        formatCurrency(results.totalInterest, false);
+                    document.getElementById('totalCost').textContent =
+                        formatCurrency(results.totalCost, false);
+
+                    // Show results section
+                    const resultsElement = document.getElementById('results');
+                    resultsElement.style.display = 'block';
+                    resultsElement.scrollIntoView({ behavior: 'smooth' });
+                } catch (error) {
+                    console.error('Error displaying results:', error);
+                }
+            }
+
+            /**
+             * Handles custom tax rate visibility based on selection
+             */
+            function handleTaxRateChange() {
+                const taxRateSelect = document.getElementById('propertyTaxRate');
+                const customGroup = document.getElementById('customTaxGroup');
+                const customTaxInput = document.getElementById('customTaxRate');
+
+                if (taxRateSelect.value === 'custom') {
+                    customGroup.style.display = 'block';
+                    customTaxInput.required = true;
+                } else {
+                    customGroup.style.display = 'none';
+                    customTaxInput.required = false;
+                }
+            }
+
+            /**
+             * Auto-calculates and updates PMI based on down payment percentage
+             */
+            function handlePMICalculation() {
+                try {
+                    const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
+                    const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+
+                    if (homePrice <= 0) {
+                        return;
+                    }
+
+                    const downPaymentPercent = (downPayment / homePrice) * 100;
+                    const pmiInput = document.getElementById('pmi');
+
+                    // PMI required when down payment < 20%
+                    if (downPaymentPercent < PMI_THRESHOLD) {
+                        const loanAmount = homePrice - downPayment;
+                        const estimatedPMI = calculatePMI(loanAmount);
+                        pmiInput.value = estimatedPMI;
+                    } else {
+                        pmiInput.value = 0;
+                    }
+                } catch (error) {
+                    console.error('Error calculating PMI:', error);
+                }
+            }
+
+            /**
+             * Main mortgage calculation function
+             * Computes all mortgage-related costs and displays results
+             */
+            function calculateMortgage() {
+                try {
+                    // Get input values
+                    const homePrice = parseFloat(document.getElementById('homePrice').value) || 0;
+                    const downPayment = parseFloat(document.getElementById('downPayment').value) || 0;
+                    const annualRatePercent = parseFloat(document.getElementById('interestRate').value) || 0;
+                    const loanTermYears = parseInt(document.getElementById('loanTerm').value) || 30;
+
+                    // Get millage rate
+                    const taxRateSelect = document.getElementById('propertyTaxRate').value;
+                    const millageRate = taxRateSelect === 'custom'
+                        ? parseFloat(document.getElementById('customTaxRate').value) || 0
+                        : parseFloat(taxRateSelect) || 0;
+
+                    const annualInsurance = parseFloat(document.getElementById('homeInsurance').value) || 0;
+                    const monthlyPMI = parseFloat(document.getElementById('pmi').value) || 0;
+                    const monthlyHOA = parseFloat(document.getElementById('hoaFees').value) || 0;
+
+                    // Validate inputs
+                    const validation = validateInputs(homePrice, downPayment);
+                    if (!validation.isValid) {
+                        alert(validation.error);
+                        return;
+                    }
+
+                    // Calculate loan amount
+                    const loanAmount = homePrice - downPayment;
+                    const annualRate = annualRatePercent / 100;
+
+                    // Calculate monthly principal & interest
+                    const monthlyPI = calculateMonthlyPayment(loanAmount, annualRate, loanTermYears);
+
+                    // Calculate monthly costs
+                    const annualPropertyTax = calculatePropertyTax(homePrice, millageRate);
+                    const monthlyPropertyTax = annualPropertyTax / 12;
+                    const monthlyInsurance = annualInsurance / 12;
+
+                    // Calculate total monthly payment
+                    const totalMonthlyPayment = monthlyPI + monthlyPropertyTax +
+                                               monthlyInsurance + monthlyPMI + monthlyHOA;
+
+                    // Calculate total costs over life of loan
+                    const numPayments = loanTermYears * 12;
+                    const totalPrincipalInterest = monthlyPI * numPayments;
+                    const totalInterest = totalPrincipalInterest - loanAmount;
+                    const totalCost = homePrice + totalInterest +
+                                     (annualInsurance * loanTermYears) +
+                                     (monthlyPMI * numPayments) +
+                                     (monthlyHOA * numPayments);
+
+                    // Display results
+                    displayResults({
+                        monthlyPI,
+                        monthlyPropertyTax,
+                        monthlyInsurance,
+                        monthlyPMI,
+                        monthlyHOA,
+                        totalMonthlyPayment,
+                        loanAmount,
+                        downPayment,
+                        totalInterest,
+                        totalCost
+                    });
+                } catch (error) {
+                    console.error('Error in mortgage calculation:', error);
+                    alert('An error occurred while calculating. Please check your inputs and try again.');
+                }
+            }
+
+            /**
+             * Initialize event listeners and default calculations
+             */
+            function init() {
+                // Tax rate selector
+                document.getElementById('propertyTaxRate')
+                    .addEventListener('change', handleTaxRateChange);
+
+                // PMI auto-calculation
+                document.getElementById('downPayment')
+                    .addEventListener('input', handlePMICalculation);
+
+                document.getElementById('homePrice')
+                    .addEventListener('input', handlePMICalculation);
+
+                // Calculate on page load with default values
+                calculateMortgage();
+            }
+
+            // Expose calculateMortgage to global scope for form button
+            window.calculateMortgage = calculateMortgage;
+
+            // Initialize on page load
+            window.addEventListener('load', init);
+        })();
     </script>
 </body>
 </html>
