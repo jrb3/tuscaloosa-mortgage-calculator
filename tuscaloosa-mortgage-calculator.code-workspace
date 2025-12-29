@@ -1,0 +1,72 @@
+{
+  "folders": [
+    {
+      "path": ".",
+      "name": "Tuscaloosa Mortgage Calculator"
+    }
+  ],
+  "settings": {
+    "files.exclude": {
+      "**/.git": true,
+      "**/__pycache__": true,
+      "**/*.pyc": true,
+      ".venv": false
+    },
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[html]": {
+      "editor.defaultFormatter": "vscode.html-language-features",
+      "editor.formatOnSave": true
+    },
+    "[css]": {
+      "editor.defaultFormatter": "vscode.css-language-features",
+      "editor.formatOnSave": true
+    },
+    "[javascript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features",
+      "editor.formatOnSave": true
+    },
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.black-formatter",
+      "editor.formatOnSave": true
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "ritwickdey.liveserver",
+      "formulahendry.auto-rename-tag",
+      "ms-python.python",
+      "ms-python.black-formatter",
+      "esbenp.prettier-vscode",
+      "streetsidesoftware.code-spell-checker",
+      "eamodio.gitlens"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Launch Mortgage Calculator",
+        "type": "chrome",
+        "request": "launch",
+        "file": "${workspaceFolder}/tuscaloosa-mortgage-calculator.html",
+        "webRoot": "${workspaceFolder}"
+      }
+    ],
+    "compounds": []
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Live Server",
+        "type": "shell",
+        "command": "echo 'Use Ctrl+Shift+L to start Live Server or right-click the HTML file'",
+        "problemMatcher": [],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        }
+      }
+    ]
+  }
+}

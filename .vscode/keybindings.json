@@ -1,0 +1,37 @@
+[
+  {
+    "key": "ctrl+shift+l",
+    "command": "liveServer.goLive",
+    "when": "resourceExtname == .html"
+  },
+  {
+    "key": "ctrl+shift+k",
+    "command": "liveServer.goOffline"
+  },
+  {
+    "key": "ctrl+alt+f",
+    "command": "editor.action.formatDocument"
+  },
+  {
+    "key": "ctrl+shift+p",
+    "command": "workbench.action.showCommands"
+  },
+  {
+    "key": "ctrl+`",
+    "command": "workbench.action.terminal.toggleTerminal"
+  },
+  {
+    "key": "ctrl+shift+`",
+    "command": "workbench.action.terminal.new"
+  },
+  {
+    "key": "f5",
+    "command": "workbench.action.debug.start",
+    "when": "resourceExtname == .py"
+  },
+  {
+    "key": "ctrl+f5",
+    "command": "python.execInTerminal",
+    "when": "resourceExtname == .py"
+  }
+]

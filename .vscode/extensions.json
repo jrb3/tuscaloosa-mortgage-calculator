@@ -1,0 +1,50 @@
+{
+  "recommendations": [
+    // Essential for Claude Code development
+    "ms-python.python",
+    "ms-python.flake8",
+    "ms-python.black-formatter",
+
+    // Web development (HTML, CSS, JS)
+    "bradlc.vscode-tailwindcss",
+    "ritwickdey.liveserver",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "zignd.html-css-class-completion",
+    "ecmel.vscode-html-css",
+    "ms-vscode.vscode-css-peek",
+
+    // JavaScript/TypeScript
+    "ms-vscode.vscode-typescript-next",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+
+    // General development productivity
+    "ms-vscode.vscode-json",
+    "streetsidesoftware.code-spell-checker",
+    "vscode-icons-team.vscode-icons",
+    "ms-vscode.vscode-todo-highlight",
+    "christian-kohler.npm-intellisense",
+
+    // Git integration
+    "eamodio.gitlens",
+    "donjayamanne.githistory",
+
+    // Claude Code specific
+    "ms-vscode.remote-containers",
+    "ms-vscode.remote-ssh",
+    "github.copilot",
+
+    // Markdown support (for documentation)
+    "yzhang.markdown-all-in-one",
+    "shd101wyy.markdown-preview-enhanced",
+
+    // File management
+    "alefragnani.project-manager",
+    "formulahendry.code-runner"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.vscode-typescript",
+    "hookyqr.beautify"
+  ]
+}

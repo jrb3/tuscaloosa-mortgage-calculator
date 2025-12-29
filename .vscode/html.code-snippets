@@ -1,0 +1,153 @@
+{
+  "Mortgage Calculator Input Field": {
+    "prefix": "mort-input",
+    "body": [
+      "<div class=\"form-group\">",
+      "  <label for=\"${1:fieldId}\">${2:Label Text}:</label>",
+      "  <input type=\"${3|number,text,range|}\" id=\"${1:fieldId}\" name=\"${1:fieldId}\" value=\"${4:0}\" ${5:min=\"0\"} ${6:step=\"1\"}>",
+      "</div>"
+    ],
+    "description": "Create a form input field for mortgage calculator"
+  },
+  "Mortgage Calculator Select Dropdown": {
+    "prefix": "mort-select",
+    "body": [
+      "<div class=\"form-group\">",
+      "  <label for=\"${1:selectId}\">${2:Label Text}:</label>",
+      "  <select id=\"${1:selectId}\" name=\"${1:selectId}\">",
+      "    <option value=\"${3:value1}\">${4:Option 1}</option>",
+      "    <option value=\"${5:value2}\">${6:Option 2}</option>",
+      "  </select>",
+      "</div>"
+    ],
+    "description": "Create a select dropdown for mortgage calculator"
+  },
+  "Result Display Section": {
+    "prefix": "mort-result",
+    "body": [
+      "<div class=\"result-section\">",
+      "  <h3>${1:Section Title}</h3>",
+      "  <div class=\"result-item\">",
+      "    <span class=\"label\">${2:Label}:</span>",
+      "    <span class=\"value\" id=\"${3:resultId}\">$0</span>",
+      "  </div>",
+      "</div>"
+    ],
+    "description": "Create a result display section"
+  },
+  "JavaScript Calculate Function": {
+    "prefix": "mort-calc",
+    "body": [
+      "function calculate${1:FunctionName}() {",
+      "  const ${2:input} = parseFloat(document.getElementById('${3:inputId}').value);",
+      "  ",
+      "  // Calculation logic",
+      "  const ${4:result} = ${5:calculation};",
+      "  ",
+      "  // Update display",
+      "  document.getElementById('${6:resultId}').textContent = '$$' + ${4:result}.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});",
+      "}"
+    ],
+    "description": "Create a calculation function for mortgage calculator"
+  },
+  "Event Listener for Input": {
+    "prefix": "mort-listener",
+    "body": [
+      "document.getElementById('${1:inputId}').addEventListener('${2|input,change,click|}', function() {",
+      "  ${3:functionName}();",
+      "});"
+    ],
+    "description": "Add event listener to input field"
+  },
+  "Alabama Property Tax Calculation": {
+    "prefix": "mort-altax",
+    "body": [
+      "// Alabama property tax: (Appraised Value × 10% Assessment) × Millage Rate",
+      "const appraisedValue = ${1:homePrice};",
+      "const assessmentRate = 0.10; // 10% for residential property in Alabama",
+      "const millageRate = ${2:millageRate} / 1000; // Convert mills to decimal",
+      "const annualPropertyTax = (appraisedValue * assessmentRate) * millageRate;",
+      "const monthlyPropertyTax = annualPropertyTax / 12;"
+    ],
+    "description": "Calculate Alabama property tax"
+  },
+  "PMI Calculation": {
+    "prefix": "mort-pmi",
+    "body": [
+      "// PMI calculation (typically 0.5% - 1% of loan amount annually)",
+      "const loanAmount = ${1:homePrice} - ${2:downPayment};",
+      "const ltvRatio = (loanAmount / ${1:homePrice}) * 100;",
+      "let monthlyPMI = 0;",
+      "",
+      "if (ltvRatio > 80) {",
+      "  const pmiRate = ${3:0.005}; // 0.5% annual rate",
+      "  monthlyPMI = (loanAmount * pmiRate) / 12;",
+      "}"
+    ],
+    "description": "Calculate PMI based on LTV ratio"
+  },
+  "Mortgage Payment Calculation": {
+    "prefix": "mort-payment",
+    "body": [
+      "// Monthly mortgage payment calculation",
+      "const principal = ${1:loanAmount};",
+      "const monthlyRate = ${2:annualRate} / 12 / 100;",
+      "const numberOfPayments = ${3:loanTerm} * 12;",
+      "",
+      "const monthlyPayment = principal * ",
+      "  (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / ",
+      "  (Math.pow(1 + monthlyRate, numberOfPayments) - 1);"
+    ],
+    "description": "Calculate monthly mortgage payment"
+  },
+  "Currency Formatter": {
+    "prefix": "mort-currency",
+    "body": [
+      "function formatCurrency(${1:amount}) {",
+      "  return '$$' + ${1:amount}.toLocaleString('en-US', {",
+      "    minimumFractionDigits: 2,",
+      "    maximumFractionDigits: 2",
+      "  });",
+      "}"
+    ],
+    "description": "Format number as currency"
+  },
+  "CSS Grid Layout": {
+    "prefix": "mort-grid",
+    "body": [
+      ".${1:container} {",
+      "  display: grid;",
+      "  grid-template-columns: ${2|repeat(2\\, 1fr),repeat(3\\, 1fr),1fr 2fr|};",
+      "  gap: ${3:1rem};",
+      "  padding: ${4:1rem};",
+      "}"
+    ],
+    "description": "Create CSS grid layout"
+  },
+  "Responsive Media Query": {
+    "prefix": "mort-responsive",
+    "body": [
+      "@media (max-width: ${1:768px}) {",
+      "  .${2:selector} {",
+      "    ${3:property}: ${4:value};",
+      "  }",
+      "}"
+    ],
+    "description": "Create responsive media query"
+  },
+  "Form Validation": {
+    "prefix": "mort-validate",
+    "body": [
+      "function validate${1:Field}() {",
+      "  const ${2:value} = document.getElementById('${3:fieldId}').value;",
+      "  ",
+      "  if (${2:value} === '' || isNaN(${2:value}) || ${2:value} < ${4:0}) {",
+      "    alert('Please enter a valid ${5:field name}');",
+      "    return false;",
+      "  }",
+      "  return true;",
+      "}"
+    ],
+    "description": "Create form validation function"
+  }
+}
