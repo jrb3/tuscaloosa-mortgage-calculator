@@ -33,16 +33,6 @@
       "cwd": "${workspaceFolder}"
     },
     {
-      "name": "Python: Run russell3000 screen",
-      "type": "python",
-      "request": "launch",
-      "program": "${workspaceFolder}/r40_russell3000_screen (1).py",
-      "console": "integratedTerminal",
-      "justMyCode": true,
-      "python": "${workspaceFolder}/.venv/bin/python",
-      "cwd": "${workspaceFolder}"
-    },
-    {
       "name": "Chrome: Debug Mortgage Calculator",
       "type": "chrome",
       "request": "launch",
