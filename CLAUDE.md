@@ -87,6 +87,24 @@ Type these prefixes in VS Code and press Tab:
 - `mort-payment` - Mortgage payment formula
 - `mort-currency` - Currency formatting function
 
+## Claude Code Skills
+
+This repository includes custom skills in the `skills/` directory. Skills are reusable workflows that can be invoked with slash commands.
+
+**Available Skills**:
+- `/update-tax-rates` - Update Tuscaloosa County property tax millage rates
+
+**Using Skills**:
+```bash
+# Invoke a skill
+/update-tax-rates
+
+# With parameters
+/update-tax-rates --source https://example.com/rates --test
+```
+
+See `skills/README.md` for documentation on creating custom skills for this project.
+
 ## File Structure
 
 ```
@@ -95,6 +113,9 @@ Type these prefixes in VS Code and press Tab:
 ├── tuscaloosa-mortgage-calculator.code-workspace  # VS Code workspace
 ├── CLAUDE.md                               # This file - Claude Code instructions
 ├── .mcp.json                               # MCP server configuration
+├── skills/                                 # Claude Code custom skills
+│   ├── README.md                           # Skills documentation
+│   └── update-tax-rates.md                 # Example skill for tax rate updates
 ├── .vscode/                                # VS Code configuration
 │   ├── settings.json                       # Editor settings
 │   ├── extensions.json                     # Recommended extensions
@@ -102,6 +123,5 @@ Type these prefixes in VS Code and press Tab:
 │   ├── launch.json                         # Debug configurations
 │   ├── keybindings.json                    # Custom keyboard shortcuts
 │   └── html.code-snippets                  # Code snippets
-├── .venv/                                  # Python virtual environment
-└── landing-page/                           # Additional web content
+└── .venv/                                  # Python virtual environment
 ```
