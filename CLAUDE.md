@@ -89,10 +89,16 @@ Type these prefixes in VS Code and press Tab:
 
 ## Claude Code Skills
 
-This repository includes custom skills in the `skills/` directory. Skills are reusable workflows that can be invoked with slash commands.
+This repository includes 17 skills in the `skills/` directory: 16 official Anthropic skills plus 1 project-specific skill. Skills are reusable workflows that can be invoked with slash commands.
 
-**Available Skills**:
+**Project-Specific Skill**:
 - `/update-tax-rates` - Update Tuscaloosa County property tax millage rates
+
+**Official Anthropic Skills** (16 total):
+- Document processing: `/pdf`, `/docx`, `/pptx`, `/xlsx`, `/doc-coauthoring`
+- Creative & design: `/algorithmic-art`, `/canvas-design`, `/frontend-design`, `/theme-factory`, `/slack-gif-creator`
+- Development: `/mcp-builder`, `/skill-creator`, `/webapp-testing`, `/web-artifacts-builder`
+- Enterprise: `/brand-guidelines`, `/internal-comms`
 
 **Using Skills**:
 ```bash
@@ -101,9 +107,13 @@ This repository includes custom skills in the `skills/` directory. Skills are re
 
 # With parameters
 /update-tax-rates --source https://example.com/rates --test
+
+# Use official skills
+/pdf
+/docx
 ```
 
-See `skills/README.md` for documentation on creating custom skills for this project.
+See `skills/README.md` for complete documentation and skill descriptions.
 
 ## File Structure
 
@@ -113,9 +123,10 @@ See `skills/README.md` for documentation on creating custom skills for this proj
 ├── tuscaloosa-mortgage-calculator.code-workspace  # VS Code workspace
 ├── CLAUDE.md                               # This file - Claude Code instructions
 ├── .mcp.json                               # MCP server configuration
-├── skills/                                 # Claude Code custom skills
+├── skills/                                 # Claude Code skills (17 total)
 │   ├── README.md                           # Skills documentation
-│   └── update-tax-rates.md                 # Example skill for tax rate updates
+│   ├── update-tax-rates.md                 # Project-specific skill
+│   └── *.md                                # 16 official Anthropic skills
 ├── .vscode/                                # VS Code configuration
 │   ├── settings.json                       # Editor settings
 │   ├── extensions.json                     # Recommended extensions

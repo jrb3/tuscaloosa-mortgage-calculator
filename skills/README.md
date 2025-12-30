@@ -52,24 +52,60 @@ Detailed instructions for Claude Code on how to execute this skill.
 Show examples of how to use this skill.
 ```
 
-## Example Skills for This Project
+## Available Skills
+
+### Official Anthropic Skills
+
+Downloaded from the [Anthropic Skills Repository](https://github.com/anthropics/skills):
+
+**Creative & Design:**
+- `/algorithmic-art` - Generate algorithmic art and visualizations
+- `/canvas-design` - Design and create canvas-based graphics
+- `/frontend-design` - Frontend web design assistance
+- `/slack-gif-creator` - Create GIFs for Slack messages
+- `/theme-factory` - Generate color themes and design systems
+
+**Document Processing:**
+- `/docx` - Create and manipulate Word documents
+- `/pdf` - Comprehensive PDF manipulation toolkit
+- `/pptx` - Create and edit PowerPoint presentations
+- `/xlsx` - Work with Excel spreadsheets
+- `/doc-coauthoring` - Collaborative document authoring
+
+**Development & Technical:**
+- `/mcp-builder` - Build Model Context Protocol servers
+- `/skill-creator` - Create new Claude Code skills
+- `/webapp-testing` - Test web applications
+- `/web-artifacts-builder` - Build web artifacts and components
+
+**Enterprise & Communication:**
+- `/brand-guidelines` - Maintain brand consistency
+- `/internal-comms` - Internal communications assistance
+
+### Project-Specific Skills
+
+Custom skills for this Tuscaloosa Mortgage Calculator project:
+
+- `/update-tax-rates` - Update Tuscaloosa County property tax millage rates
+
+### Ideas for Additional Custom Skills
 
 Potential skills you could create:
 
 - **calculate-mortgage**: Calculate mortgage payments with Tuscaloosa County taxes
-- **update-tax-rates**: Update millage rates from current county data
 - **validate-calculator**: Run validation tests on the calculator logic
 - **deploy**: Deploy the calculator to a hosting service
 - **optimize-html**: Optimize and minify the HTML file
 
 ## Getting Started
 
-Check out the example skill file in this directory to see a working example specific to this project.
+Check out the existing skill files in this directory to see working examples. The official Anthropic skills show advanced patterns, while `update-tax-rates.md` shows a project-specific example.
 
 ## Resources
 
-- [Claude Code Skills Documentation](https://docs.anthropic.com/claude-code/skills)
-- [Skill Examples Repository](https://github.com/anthropics/claude-code-examples)
+- [Official Anthropic Skills Repository](https://github.com/anthropics/skills) - Source of all official skills
+- [Claude Code Documentation](https://docs.anthropic.com/claude-code)
+- [Awesome Claude Skills](https://github.com/travisvn/awesome-claude-skills) - Community curated list
 
 ## Contributing
 
